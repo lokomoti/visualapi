@@ -1,0 +1,6 @@
+*.sqlite3
+.venv
+.ruff_cache
+.env
+ruff.toml
+README.md
