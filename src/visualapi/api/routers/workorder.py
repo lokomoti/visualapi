@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi_cache.decorator import cache
-from sqlalchemy.orm import selectinload
-from sqlmodel import Session, select
-
-from db import get_db
 from models.workorder import WorkOrder, WorkOrderPublic, WorkOrderStatus
+from sqlalchemy.orm import selectinload
+from sqlmodel import select
+from api.deps import SessionDep
 
 router = APIRouter(prefix="/workorders", tags=["Workorders"])
 
@@ -15,7 +14,7 @@ router = APIRouter(prefix="/workorders", tags=["Workorders"])
     responses={404: {"description": "Work order not found"}},
 )
 @cache(expire=60)
-def get_workorder(base_id: str, db_session: Session = Depends(get_db)):
+def get_workorder(base_id: str, db_session: SessionDep):
     """Get a work order by its base ID."""
     with db_session as session:
         statement = (
@@ -40,11 +39,11 @@ def get_workorder(base_id: str, db_session: Session = Depends(get_db)):
 )
 @cache(expire=60)
 def get_workorders(
+    db_session: SessionDep,
     status: list[WorkOrderStatus] = Query(
         default=None, description="List of status chars"
     ),
-    base_id_startswith: str | None = None,
-    db_session: Session = Depends(get_db),
+    base_id_startswith: str | None = None
 ):
     """Get all work orders, optionally filtered by statuses or base ID."""
     with db_session as session:

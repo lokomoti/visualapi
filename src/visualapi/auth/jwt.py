@@ -1,14 +1,8 @@
 """JWT authentication utilities for the Visual API."""
 
-import os
-
 import jwt
-from dotenv import load_dotenv
 
-load_dotenv()
-
-JWT_SECRET = os.getenv("API_JWT_SECRET")
-JWT_ALGORITHM = os.getenv("API_JWT_ALGORITHM", "HS256")
+JWT_ALGORITHM = "HS256"
 
 
 class JWTDecodeError(Exception):
@@ -23,33 +17,37 @@ class JWTExpiredError(JWTDecodeError):
     pass
 
 
-def decode_jwt(token: str, audience: str) -> dict:
+def decode_jwt(secret: str, token: str, audience: str) -> dict:
     """Decode a JWT token and return the payload.
     Args:
-        token (str): The JWT token to decode.
-        audience (str): The expected audience of the token.
+        secret: The secret key used to decode the token.
+        token: The JWT token to decode.
+        audience: The expected audience of the token.
     Returns:
-        dict: The decoded payload of the JWT token.
+        The decoded payload of the JWT token.
     Raises:
         JWTDecodeError: If the token is invalid or cannot be decoded.
         JWTExpiredError: If the token has expired.
     """
     try:
         payload = jwt.decode(
-            token, JWT_SECRET, algorithms=[JWT_ALGORITHM], audience=audience
+            token, secret, algorithms=[JWT_ALGORITHM], audience=audience
         )
         return payload
+
     except jwt.ExpiredSignatureError:
         raise JWTExpiredError("Token expired")
+
     except jwt.InvalidTokenError:
         raise JWTDecodeError("Invalid token")
 
 
-def encode_jwt(payload: dict) -> str:
+def encode_jwt(payload: dict, secret: str) -> str:
     """Encode a payload into a JWT token.
     Args:
-        payload (dict): The payload to encode into a JWT token.
+        payload: The payload to encode into a JWT token.
+        secret: The secret key used to encode the token.
     Returns:
-        str: The encoded JWT token.
+        The encoded JWT token.
     """
-    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    return jwt.encode(payload, secret, algorithm=JWT_ALGORITHM)

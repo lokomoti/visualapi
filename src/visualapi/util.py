@@ -1,10 +1,11 @@
 """Utility functions for the Visual API."""
 
-import os
 from pathlib import Path
 
+from config import settings
+
 # Network drive mappings for reading drawings
-ENV_MOUNT_MAPPINGS = os.getenv("PDM_MOUNT_MAPPINGS", None)
+ENV_MOUNT_MAPPINGS = settings.NETWORK_MOUNT_MAPPINGS
 
 
 def _parse_mappings(env_value: str) -> dict[str, str]:

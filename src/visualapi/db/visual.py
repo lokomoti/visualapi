@@ -1,16 +1,16 @@
-import os
 import urllib.parse
 from typing import Generator
 
+from config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-DB_DRIVER = os.getenv("VISUAL_DB_DRIVER")
-DB_SERVER = os.getenv("VISUAL_DB_SERVER")
-DB_PORT = os.getenv("VISUAL_DB_PORT", "1433")
-DB_DATABASE = os.getenv("VISUAL_DB_NAME")
-DB_USER = os.getenv("VISUAL_DB_USER")
-DB_PASSWORD = os.getenv("VISUAL_DB_PASSWORD")
+DB_DRIVER = settings.VISUAL_DB_DRIVER
+DB_SERVER = settings.VISUAL_DB_SERVER
+DB_PORT = settings.VISUAL_DB_PORT
+DB_DATABASE = settings.VISUAL_DB_NAME
+DB_USER = settings.VISUAL_DB_USER
+DB_PASSWORD = settings.VISUAL_DB_PASSWORD
 
 odbc_str = (
     f"DRIVER={{{DB_DRIVER}}};"
@@ -28,6 +28,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db() -> Generator[Session, None, None]:
+    """Get a database session."""
     db = SessionLocal()
     try:
         yield db

@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi_cache.decorator import cache
+from models.customerorderline import (
+    CustomerOrderLine,
+    CustomerOrderLinePublic,
+    CustomerOrderLineWithPartPublic,
+)
 from sqlalchemy.orm import selectinload
-from sqlmodel import Session, select
-
-from db import get_db
-from models.customerorderline import (CustomerOrderLine,
-                                      CustomerOrderLinePublic,
-                                      CustomerOrderLineWithPartPublic)
+from sqlmodel import select
+from api.deps import SessionDep
 
 router = APIRouter(prefix="/customerorderlines", tags=["Customer Order Lines"])
 
@@ -18,7 +19,7 @@ router = APIRouter(prefix="/customerorderlines", tags=["Customer Order Lines"])
 )
 @cache(expire=60)
 def get_customer_order_line(
-    customer_order_id: str, line_no: int, db_session: Session = Depends(get_db)
+    customer_order_id: str, line_no: int, db_session: SessionDep
 ) -> CustomerOrderLineWithPartPublic:
     """Get customer order line by ID and line number."""
     with db_session as session:
@@ -41,7 +42,7 @@ def get_customer_order_line(
 @router.get("/{customer_order_id}", response_model=list[CustomerOrderLinePublic])
 @cache(expire=60)
 def get_customer_order_lines(
-    customer_order_id: str, db_session: Session = Depends(get_db)
+    customer_order_id: str, db_session: SessionDep
 ) -> list[CustomerOrderLinePublic]:
     """Get all customer order lines for a given customer order ID."""
     with db_session as session:

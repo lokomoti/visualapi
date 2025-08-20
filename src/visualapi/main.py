@@ -2,16 +2,12 @@
 
 from contextlib import asynccontextmanager
 
-from dotenv import load_dotenv
+from api.routers import router as api_router
+from db import local as db_local
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
-from api.routers import router as api_router
-from db import local as db_local
-
-
-load_dotenv()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -24,6 +20,6 @@ app = FastAPI(
     title="Visual API",
     description="API for querying data from Visual ERP system",
     version="0.0.1",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 app.include_router(api_router)

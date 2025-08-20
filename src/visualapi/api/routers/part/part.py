@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi_cache.decorator import cache
-from sqlmodel import Session, select
-
-from db import get_db
 from models.part import Part, PartPublic
+from sqlmodel import select
+from api.deps import SessionDep
 
 router = APIRouter()
 
@@ -14,7 +13,7 @@ router = APIRouter()
     responses={404: {"description": "Part not found"}},
 )
 @cache(expire=60)
-def get_part(part_id: str, db_session: Session = Depends(get_db)):
+def get_part(part_id: str, db_session: SessionDep):
     """Get a part by its ID."""
     with db_session as session:
         statement = select(Part).where(Part.id == part_id)
@@ -33,9 +32,9 @@ def get_part(part_id: str, db_session: Session = Depends(get_db)):
 )
 @cache(expire=60)
 def get_parts(
+    db_session: SessionDep,
     part_id_startswith: str | None,
-    exclude_obsolete: bool = True,
-    db_session: Session = Depends(get_db),
+    exclude_obsolete: bool = True
 ):
     """Get parts, optionally filtered by ID prefix and obsolete status."""
     with db_session as session:

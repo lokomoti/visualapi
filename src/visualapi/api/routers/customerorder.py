@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi_cache.decorator import cache
-from sqlalchemy.orm import selectinload
-from sqlmodel import Session, select
-
-from db import get_db
 from models.customerorder import CustomerOrder, CustomerOrderPublic
+from sqlalchemy.orm import selectinload
+from sqlmodel import select
+from api.deps import SessionDep
 
 router = APIRouter(prefix="/customerorders", tags=["Customer Orders"])
 
@@ -16,8 +15,8 @@ router = APIRouter(prefix="/customerorders", tags=["Customer Orders"])
 )
 @cache(expire=60)
 def get_customer_order(
-    customer_order_id: str,
-    db_session: Session = Depends(get_db),
+    db_session: SessionDep,
+    customer_order_id: str
 ):
     """Get a customer order by ID."""
     with db_session as session:
@@ -44,9 +43,9 @@ def get_customer_order(
 )
 @cache(expire=60)
 def get_customer_orders(
+    db_session: SessionDep,
     customer_id: str | None = None,
-    order_id_startswith: str | None = None,
-    db_session: Session = Depends(get_db),
+    order_id_startswith: str | None = None
 ):
     """Get all customer orders, optionally filtered by customer ID or order ID prefix."""
     with db_session as session:

@@ -1,3 +1,3 @@
 """DB package."""
 
-from db.visual import get_db
+from db.visual import get_db as get_db

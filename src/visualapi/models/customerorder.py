@@ -7,7 +7,6 @@ from sqlmodel import Field, Relationship, SQLModel
 import models
 from models.customer import Customer, CustomerPublic
 from models.customerorderline import CustomerOrderLine, CustomerOrderLinePublic
-from models.site import Site
 
 
 class CustomerOrderBase(SQLModel):

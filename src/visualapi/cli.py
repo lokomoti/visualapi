@@ -7,12 +7,12 @@ Blacklists tokens and provides a simple interface to manage these tokens.
 import datetime
 import uuid
 
-import click
-
 import api
+import click
 from auth import blacklist as jwt_blacklist
 from auth.api import AUDIENCE
-from auth.jwt import JWT_SECRET, decode_jwt, encode_jwt
+from auth.jwt import decode_jwt, encode_jwt
+from config import settings
 
 ISSUER = "visualapi-admin-cli"
 
@@ -79,7 +79,7 @@ def decode_jwt_cmd(token):
 )
 def generate_jwt(sub, exp, claim, allow):
     """Generate a JWT with the specified subject, expiration, claims, and allowed segments."""
-    if not JWT_SECRET:
+    if not settings.API_JWT_SECRET:
         click.echo("Error: SECRET_KEY environment variable not set.", err=True)
         raise click.Abort()
 
@@ -102,7 +102,7 @@ def generate_jwt(sub, exp, claim, allow):
         key, value = c.split("=", 1)
         payload[key.strip()] = value.strip()
 
-    token = encode_jwt(payload)
+    token = encode_jwt(payload, settings.API_JWT_SECRET)
     click.secho("\nGenerated JWT:", fg="green", bold=True)
     click.secho(token, fg="yellow", bold=True)
     click.secho("\nJWT Payload:", fg="blue", bold=True)
@@ -120,7 +120,7 @@ def generate_jwt(sub, exp, claim, allow):
 def blacklist_add(token):
     """Add a JWT's jti to the blacklist."""
     try:
-        payload = decode_jwt(token, audience=AUDIENCE)
+        payload = decode_jwt(settings.API_JWT_SECRET, token, audience=AUDIENCE)
         jti = payload.get("jti")
         if not jti:
             click.secho("JWT does not contain a 'jti' claim.", fg="red", err=True)
@@ -137,7 +137,7 @@ def blacklist_add(token):
 def blacklist_check(token):
     """Check if a JWT's jti is blacklisted."""
     try:
-        payload = decode_jwt(token, audience=AUDIENCE)
+        payload = decode_jwt(settings.API_JWT_SECRET, token, audience=AUDIENCE)
         jti = payload.get("jti")
         if not jti:
             click.secho("JWT does not contain a 'jti' claim.", fg="red", err=True)

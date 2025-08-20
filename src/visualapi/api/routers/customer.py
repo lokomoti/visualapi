@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter
 from fastapi_cache.decorator import cache
-from sqlmodel import Session, select
-
-from db import get_db
 from models.customer import Customer, CustomerPublic
+from sqlmodel import select
+from api.deps import SessionDep
 
 router = APIRouter(prefix="/customers", tags=["Customers"])
 
@@ -11,9 +10,9 @@ router = APIRouter(prefix="/customers", tags=["Customers"])
 @router.get("/", response_model=list[CustomerPublic])
 @cache(expire=60)
 def get_customers(
+    db_session: SessionDep,
     customer_id: str | None = None,
     country_id: str | None = None,
-    db_session: Session = Depends(get_db),
 ):
     """Get customers."""
     with db_session as session:

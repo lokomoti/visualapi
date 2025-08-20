@@ -1,13 +1,12 @@
-import os
-
+from auth import blacklist as jwt_blacklist
+from auth.jwt import JWTDecodeError, JWTExpiredError, decode_jwt
+from config import settings
 from fastapi import HTTPException, Security
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from auth import blacklist as jwt_blacklist
-from auth.jwt import JWTDecodeError, JWTExpiredError, decode_jwt
-
 # JWT audience for the Visual API
 AUDIENCE = "visualapi"
+SECRET = settings.API_JWT_SECRET
 
 
 def authorize(token: HTTPAuthorizationCredentials = Security(HTTPBearer())) -> None:
@@ -23,7 +22,7 @@ def authorize(token: HTTPAuthorizationCredentials = Security(HTTPBearer())) -> N
         raise HTTPException(status_code=401, detail="Missing or invalid token")
 
     try:
-        payload = decode_jwt(token.credentials, audience=AUDIENCE)
+        payload = decode_jwt(SECRET, token.credentials, audience=AUDIENCE)
         jti = payload.get("jti")
 
         if not jti:
