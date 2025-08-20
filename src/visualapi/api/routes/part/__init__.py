@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
+
 from api.deps import authorize
-from api.routers.part.drawing import router as drawing_router
-from api.routers.part.part import router as parts_router
+from api.routes.part.drawing import router as drawing_router
+from api.routes.part.part import router as parts_router
 
 router = APIRouter(prefix="/parts", tags=["Parts"])
 

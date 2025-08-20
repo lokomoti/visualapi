@@ -35,8 +35,8 @@ def verify_signed_url(token: str, resource: str) -> None:
         )
     except jwt.JWTExpiredError:
         raise SignedUrlError("Token has expired")
-    
-    except jwt.JWTDecodeError as e:
+
+    except jwt.JWTDecodeError:
         raise SignedUrlError("Invalid token")
 
     if not payload.get("resource") == resource:

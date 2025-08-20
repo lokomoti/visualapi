@@ -2,7 +2,7 @@
 
 from contextlib import asynccontextmanager
 
-from api.routers import router as api_router
+from api.routes import router as api_router
 from db import local as db_local
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache

@@ -42,9 +42,11 @@ def map_network_to_local(orig_path: str) -> str:
     """
     if not orig_path:
         return orig_path
+
     # preserve original-case normalized path for suffix extraction
     orig_norm = orig_path.replace("\\", "/").lstrip("/")
     norm = orig_norm.lower()
+
     # longest prefix first
     for net_prefix, local in sorted(
         _NETWORK_MOUNT_MAPPINGS.items(), key=lambda kv: -len(kv[0])
@@ -53,7 +55,9 @@ def map_network_to_local(orig_path: str) -> str:
             # take suffix from orig_norm to preserve case
             suffix = orig_norm[len(net_prefix) :].lstrip("/")
             mapped = Path(local).joinpath(*([p for p in suffix.split("/") if p]))
+
             return str(mapped)
+
     return orig_path
 
 
@@ -64,13 +68,17 @@ def validate_mapped_path(mapped_path: str, allowed_mount: str | None = None) -> 
     """
     try:
         mapped = Path(mapped_path).resolve()
+
         if allowed_mount is None:
             # if single mapping, use its value; otherwise require explicit allowed_mount
             if len(_NETWORK_MOUNT_MAPPINGS) == 1:
                 allowed_mount = next(iter(_NETWORK_MOUNT_MAPPINGS.values()))
             else:
                 return False
+
         allowed = Path(allowed_mount).resolve()
+
         return allowed == mapped or allowed in mapped.parents
+
     except Exception:
         return False
