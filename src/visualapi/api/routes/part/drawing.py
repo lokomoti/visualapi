@@ -36,7 +36,14 @@ def retrieve_pdf(visual_file_path: str) -> FileResponse:
     if not Path(mapped_path).exists():
         raise HTTPException(status_code=404, detail="PDF file not found")
 
-    return FileResponse(mapped_path, media_type="application/pdf")
+    filename = Path(mapped_path).name
+    
+    return FileResponse(
+        mapped_path, 
+        media_type="application/pdf", 
+        filename=filename, 
+        content_disposition_type="inline"
+    )
 
 
 @router.get("/", dependencies=[Depends(authorize)])
