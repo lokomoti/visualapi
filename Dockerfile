@@ -1,4 +1,3 @@
-# Use the official Python image from Docker Hub
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
 ENV ACCEPT_EULA=Y
@@ -16,10 +15,8 @@ RUN apt-get update && \
 # Copy the project into the image
 ADD . /app
 
-
 # Sync the project into a new environment, asserting the lockfile is up to date
 WORKDIR /app
 RUN uv sync --frozen --no-cache
-
 
 CMD ["/app/.venv/bin/fastapi", "run", "/app/src/visualapi/main.py", "--port", "80"]
