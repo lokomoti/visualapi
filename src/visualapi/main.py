@@ -7,6 +7,7 @@ from db import local as db_local
 from fastapi import FastAPI
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.inmemory import InMemoryBackend
+from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager
@@ -22,4 +23,12 @@ app = FastAPI(
     version="0.0.1",
     lifespan=lifespan,
 )
+
 app.include_router(api_router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET"],
+    allow_headers=["*"],
+)
